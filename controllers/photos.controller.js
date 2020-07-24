@@ -1,5 +1,5 @@
 const Photo = require("../models/photo.model");
-
+const Voter = require("../models/Voters.model");
 /****** SUBMIT PHOTO ********/
 
 exports.add = async (req, res) => {
@@ -9,10 +9,30 @@ exports.add = async (req, res) => {
 
     if (title && author && email && file) {
       // if fields are not empty...
-
+      const invalidSigns = /[<>%\$]/;;
+      const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
       const fileName = file.path.split("/").slice(-1)[0]; // cut only filename from full path, e.g. C:/test/abc.jpg -> abc.jpg
-      const fileExt = fileName.split(".").slice(-1)[0];
-      if (fileExt === "jpg" || fileExt === "png" || fileExt === "gif") {
+      const validExt = /(.*?)\.(jpg|jpeg|gif|png)$/; 
+      /*form validation*/
+
+      let isValid = true;
+      if(!title, !author, !email, !file) {
+        isValid = false;
+        throw new Error('fill in the form');
+      }
+      else if (invalidSigns.test(title) || invalidSigns.test(author)) {
+        isValid = false;
+        throw new Error('form contains invalid characters');
+      }
+      else if (!emailPattern.test(email)) {
+        isValid = false;
+        throw new Error('invalid email address');
+      } 
+      else if (!validExt.test(email)) {
+        isValid = false;
+        throw new Error('invalid file format');
+      }
+      if (isValid) {
         const newPhoto = new Photo({
           title,
           author,
